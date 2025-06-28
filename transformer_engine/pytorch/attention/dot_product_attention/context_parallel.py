@@ -2620,8 +2620,8 @@ class AttnFuncWithCPAndKVP2P(torch.autograd.Function):
 
             if ctx.enable_mla:
                 # [cp, b, 2, sk//2, np, hn] or [cp, 2, sk//2, b, np, hn]
-                dk_fp8 = dkv_fp8[: ctx.k_numel].view(cp_size, *ctx.k_shape)
-                dv_fp8 = dkv_fp8[ctx.k_numel :].view(cp_size, *ctx.v_shape)
+                dk_fp8 = dkv_fp8[:, : ctx.k_numel].view(cp_size, *ctx.k_shape)
+                dv_fp8 = dkv_fp8[:, ctx.k_numel :].view(cp_size, *ctx.v_shape)
                 dk = ctx.dQKV_CP_quantizer.create_tensor_from_data(
                     dk_fp8, fake_dtype=torch.float32, internal=True
                 )
