@@ -429,6 +429,19 @@ class Float8BlockwiseQTensor(Float8BlockwiseQTensorBase, QuantizedTensor):
                 )
             return Float8BlockwiseQTensor.make_like(tensor)
 
+        # record stream op
+        if func == torch.ops.aten.record_stream.default:
+            qt, stream = args
+            for t in (
+                qt._rowwise_data,
+                qt._columnwise_data,
+                qt._rowwise_scale_inv,
+                qt._columnwise_scale_inv,
+            ):
+                if t is not None and t.is_cuda:
+                    t.record_stream(stream)
+            return None
+
         # Default case
         return super().__torch_dispatch__(func, types, args, kwargs)
 
